@@ -633,6 +633,13 @@ const TOPICS = [
   },
 ];
 
+/* Video de presentación de la plataforma, en la página de inicio */
+const INTRO_VIDEO = {
+  yt: "tPqT2xv9QY0",
+  titulo: "Qué es esta plataforma",
+  desc: "Un recorrido breve por los nueve paradigmas, cómo está organizado el sitio y cómo sacarle provecho.",
+};
+
 /* Ruta de aprendizaje sugerida: agrupa los temas en bloques con sentido pedagógico */
 const RUTA = [
   { bloque: "Fundamentos", desc: "Las dos formas clásicas de aprender: con respuestas y sin ellas.", temas: ["supervisado", "no-supervisado"] },

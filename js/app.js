@@ -75,6 +75,25 @@ const byId = id => TOPICS.find(t => t.id === id);
 function chipNivel(t) { return `<span class="chip ${nivelClass(t.nivel)}">${t.nivel}</span>`; }
 function chipTiempo(t) { return `<span class="chip chip-time">${I.clock} ${t.minutos} min</span>`; }
 
+/* Tarjeta de video. El reproductor se carga solo al pulsar, para no
+   arrastrar el peso de YouTube en cada visita a la página. */
+function videoCardHtml(v, clase = "") {
+  return `
+  <div class="video-card ${clase}">
+    <button class="video-frame" data-yt="${v.yt}" aria-label="Reproducir: ${v.titulo}">
+      <img class="video-thumb" src="https://i.ytimg.com/vi/${v.yt}/maxresdefault.jpg" alt="" loading="lazy">
+      <span class="video-play" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+      </span>
+      <span class="video-label">Ver el video aquí mismo</span>
+    </button>
+    <div class="video-meta">
+      <b>${v.titulo}</b>
+      <span>${v.desc}</span>
+    </div>
+  </div>`;
+}
+
 function topicCard(t) {
   const p = topicProgress(t);
   const done = topicDone(t);
@@ -118,7 +137,14 @@ function viewInicio() {
       </div>
     </div>
 
+    ${typeof INTRO_VIDEO !== "undefined" ? `
     <div class="section-title">
+      <h2>Empieza por aquí</h2>
+      <span>Qué vas a encontrar y cómo recorrerlo</span>
+    </div>
+    ${videoCardHtml(INTRO_VIDEO, "destacado")}` : ""}
+
+    <div class="section-title" style="margin-top:42px">
       <h2>Los nueve paradigmas</h2>
       <span>Elige cualquiera: no hay un orden obligatorio</span>
     </div>
@@ -428,19 +454,7 @@ function viewTema(t) {
   if (t.video) B.push(`
     <div class="block">
       <div class="block-label">Video complementario</div>
-      <div class="video-card">
-        <button class="video-frame" data-yt="${t.video.yt}" aria-label="Reproducir: ${t.video.titulo}">
-          <img class="video-thumb" src="https://i.ytimg.com/vi/${t.video.yt}/maxresdefault.jpg" alt="" loading="lazy">
-          <span class="video-play" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
-          </span>
-          <span class="video-label">Ver el video aquí mismo</span>
-        </button>
-        <div class="video-meta">
-          <b>${t.video.titulo}</b>
-          <span>${t.video.desc}</span>
-        </div>
-      </div>
+      ${videoCardHtml(t.video)}
     </div>`);
 
   /* Ejemplos en pestañas: cotidiano vs. IA */
