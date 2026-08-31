@@ -428,6 +428,20 @@ function viewTema(t) {
       <div class="prose">${t.explicacion.map(p => `<p>${p}</p>`).join("")}</div>
     </div>`);
 
+  /* Confusión frecuente: dos conceptos que se mezclan */
+  if (t.confusion) B.push(`
+    <div class="block">
+      <div class="confusion">
+        <div class="cf-t">${t.confusion.titulo}</div>
+        <div class="cf-cols">
+          <div class="cf-col cf-a"><b>${t.confusion.a}</b><p>${t.confusion.aDesc}</p></div>
+          <div class="cf-vs">vs</div>
+          <div class="cf-col cf-b"><b>${t.confusion.b}</b><p>${t.confusion.bDesc}</p></div>
+        </div>
+        <div class="cf-clave">${t.confusion.clave}</div>
+      </div>
+    </div>`);
+
   /* Cómo funciona: pasos + diagrama */
   B.push(`
     <div class="block">

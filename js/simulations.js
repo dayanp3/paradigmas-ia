@@ -384,61 +384,166 @@ const SIM_GRID = {
 };
 
 /* =========================================================
-   4. Pipeline de transferencia — transfer learning
+   4. Congela o entrena: arma tu ajuste
+
+   Esta no es una carrera de entrenamiento, sino la decisión que
+   de verdad se toma al hacer transfer learning: qué capas dejas
+   congeladas y cuáles ajustas.
+
+   La aritmética es real: los parámetros entrenables se suman de
+   verdad y la relación parámetros-por-ejemplo se calcula de verdad.
+   El diagnóstico sale de esa relación, que es el principio que
+   gobierna el compromiso: cuantos más parámetros libres por
+   ejemplo disponible, más fácil es que el modelo memorice en vez
+   de aprender. Las cifras de las capas son de un modelo de visión
+   típico, a escala realista.
    ========================================================= */
 const SIM_TRANSFER = {
-  titulo: "Recorre el pipeline de transferencia",
-  desc: "Avanza etapa por etapa y compara lo que cuesta entrenar desde cero frente a partir de un modelo ya entrenado.",
-  controles: btn("paso", "Siguiente etapa", "primary") + btn("reiniciar", "Reiniciar"),
-  canvasOff: true,
+  titulo: "Congela o entrena: arma tu ajuste",
+  desc: "Tienes un modelo preentrenado de 96,6 millones de parámetros y una tarea nueva. Toca cada capa para congelarla o dejarla entrenable, mueve los ejemplos que tienes y mira qué le pasa a tu ajuste.",
+  controles: btn("lora", "Activar LoRA", "primary") + btn("reiniciar", "Reiniciar"),
+
+  html(id) {
+    return `
+    <div class="sim" data-sim="${id}">
+      <div class="sim-head">
+        <span class="sim-tag">Aprender haciendo</span>
+        <h3>${this.titulo}</h3>
+        <p>${this.desc}</p>
+      </div>
+
+      <div class="sim-slider">
+        <label for="ej-${id}">Ejemplos etiquetados que tienes</label>
+        <input type="range" id="ej-${id}" class="sim-range" min="0" max="28" step="1" value="6">
+        <output class="sim-out">500</output>
+      </div>
+
+      <div class="ajuste">
+        <div class="capas"></div>
+        <div class="panel"></div>
+      </div>
+
+      <div class="sim-controls">${this.controles}</div>
+      <div class="sim-note"></div>
+    </div>`;
+  },
 
   crear(root) {
-    const ETAPAS = [
-      { t: "Modelo preentrenado", d: "Un modelo ya entrenado sobre datos masivos y generales. No sabe nada de tu problema concreto, pero entiende el dominio.", cero: 100, tl: 0, nota: "Este trabajo ya está hecho: no lo pagas tú." },
-      { t: "Conocimiento previo", d: "Sus capas iniciales codifican lo general: bordes y texturas en visión, sintaxis y semántica en lenguaje. Eso es lo que se va a transferir.", cero: 100, tl: 0, nota: "Un borde sigue siendo un borde en una radiografía." },
-      { t: "Nueva tarea", d: "Llega tu problema específico, con un conjunto de datos mucho más pequeño: unos miles de ejemplos en lugar de millones.", cero: 100, tl: 5, nota: "Aquí empieza realmente tu trabajo." },
-      { t: "Fine-tuning", d: "Se continúa el entrenamiento con esos datos y una tasa de aprendizaje baja, para especializar sin destruir lo aprendido.", cero: 100, tl: 12, nota: "Tasa baja: evita el olvido catastrófico." },
-      { t: "Modelo adaptado", d: "El resultado resuelve tu tarea concreta conservando el conocimiento general de base.", cero: 100, tl: 14, nota: "Mismo resultado, una fracción del costo." },
+    /* Capas de un modelo de visión preentrenado, de la más general
+       a la más específica. Las primeras son las que conviene
+       conservar: un borde sigue siendo un borde en cualquier tarea. */
+    const CAPAS = [
+      { t: "Capa 1 · bordes y texturas",      d: "Lo más general de todo. Sirve igual en radiografías que en fotos.", p: 18.4e6 },
+      { t: "Capa 2 · formas y patrones",       d: "Combina bordes en formas. Sigue siendo bastante general.",           p: 24.1e6 },
+      { t: "Capa 3 · partes y composiciones",  d: "Empieza a especializarse en el dominio original.",                   p: 31.7e6 },
+      { t: "Capa 4 · representaciones altas",  d: "Muy ligada a la tarea con la que se preentrenó.",                    p: 22.3e6 },
+      { t: "Cabeza · salida de la tarea",      d: "La capa de salida. Casi siempre se reemplaza y se entrena.",          p:  0.082e6 },
     ];
-    let i = -1;
+    const TOTAL = CAPAS.reduce((a, c) => a + c.p, 0);   // 96,6 M
+    const EJEMPLOS = [100,150,200,300,400,500,700,1000,1500,2000,3000,4000,5000,7000,10000,
+                      15000,20000,30000,40000,50000,70000,100000,150000,200000,300000,400000,500000,700000,1000000];
+    const LORA_FRAC = 0.003;   // LoRA entrena en torno al 0,3 % de los parámetros de la capa
+
+    // por defecto: solo la cabeza entrenable (extracción de características)
+    const st = { entrena: [false, false, false, false, true], lora: false, ej: 500 };
+
+    const fmt = n => n >= 1e6 ? (n / 1e6).toFixed(1).replace(".", ",") + " M"
+                   : n >= 1e3 ? Math.round(n / 1e3) + " mil"
+                   : Math.round(n);
+    const fmtEj = n => n >= 1000 ? (n / 1000).toFixed(n % 1000 ? 1 : 0).replace(".", ",") + " mil" : n;
+
+    const entrenables = () => CAPAS.reduce((a, c, i) =>
+      a + (st.entrena[i] ? c.p * (st.lora && i < 4 ? LORA_FRAC : 1) : 0), 0);
 
     function pintar() {
-      const wrap = root.querySelector(".sim-pipeline");
-      wrap.innerHTML = ETAPAS.map((e, n) => `
-        <div class="pipe-step ${n <= i ? "on" : ""} ${n === i ? "now" : ""}">
-          <div class="pipe-dot">${n <= i ? "✓" : n + 1}</div>
-          <div class="pipe-body">
-            <b>${e.t}</b>
-            ${n === i ? `<p>${e.d}</p><span class="pipe-nota">${e.nota}</span>` : ""}
-          </div>
-        </div>`).join("");
+      const ent = entrenables();
+      const pct = (ent / TOTAL) * 100;
+      const porEjemplo = st.ej > 0 ? ent / st.ej : Infinity;
 
-      const e = ETAPAS[Math.max(0, i)];
-      const tl = i < 0 ? 0 : e.tl;
-      root.querySelector(".sim-stats").innerHTML = `
-        <div class="ss-bar">
-          <span>Entrenar desde cero</span>
-          <div class="sb"><i style="width:${i < 0 ? 0 : e.cero}%; background:var(--warn)"></i></div>
-          <em>${i < 0 ? 0 : e.cero}% del esfuerzo</em>
+      root.querySelector(".capas").innerHTML = CAPAS.map((c, i) => {
+        const on = st.entrena[i];
+        const p = on ? c.p * (st.lora && i < 4 ? LORA_FRAC : 1) : 0;
+        return `
+        <button class="capa ${on ? "entrena" : "congelada"}" data-capa="${i}">
+          <span class="capa-ic">${on ? "🔥" : "❄"}</span>
+          <span class="capa-b">
+            <b>${c.t}</b>
+            <span class="capa-d">${c.d}</span>
+          </span>
+          <span class="capa-p">
+            <em>${on ? fmt(p) : "0"}</em>
+            <span>${on ? (st.lora && i < 4 ? "con LoRA" : "entrenables") : "congelada"}</span>
+          </span>
+        </button>`;
+      }).join("");
+
+      // diagnóstico a partir de la relación parámetros/ejemplo
+      let estado, titulo, texto;
+      if (ent === 0) {
+        estado = "mal"; titulo = "No se entrena nada";
+        texto = "Con todas las capas congeladas el modelo no puede adaptarse a tu tarea. Al menos la cabeza tiene que ser entrenable.";
+      } else if (porEjemplo > 2000) {
+        estado = "mal"; titulo = "Muy pocos datos para tantos parámetros";
+        texto = `Tienes <b>${Math.round(porEjemplo).toLocaleString("es")} parámetros libres por cada ejemplo.</b> El modelo tiene margen de sobra para memorizar tus ${fmtEj(st.ej)} ejemplos en vez de aprender de ellos, y al ajustar tan a fondo puede sobrescribir lo que ya sabía: es el olvido catastrófico. Congela más capas o activa LoRA.`;
+      } else if (porEjemplo > 200) {
+        estado = "medio"; titulo = "Justo, pero puede funcionar";
+        texto = `Vas por <b>${Math.round(porEjemplo)} parámetros libres por ejemplo.</b> Es viable si vigilas la validación, pero congelar una capa más o usar LoRA te daría margen.`;
+      } else {
+        estado = "bien"; titulo = "Buena relación";
+        texto = `Solo <b>${porEjemplo < 1 ? porEjemplo.toFixed(2).replace(".", ",") : Math.round(porEjemplo)} parámetros libres por ejemplo.</b> Hay datos suficientes para lo que estás ajustando: el modelo puede especializarse sin memorizar.`;
+      }
+
+      root.querySelector(".panel").innerHTML = `
+        <div class="pv">
+          <span>Parámetros entrenables</span>
+          <b>${fmt(ent)}</b>
+          <em>de ${fmt(TOTAL)} en total</em>
         </div>
-        <div class="ss-bar">
-          <span>Con transfer learning</span>
-          <div class="sb"><i style="width:${tl}%; background:var(--ok)"></i></div>
-          <em>${tl}% del esfuerzo</em>
+        <div class="barra-capas" title="Proporción entrenable">
+          <i style="width:${Math.max(pct, ent > 0 ? 0.6 : 0)}%"></i>
+        </div>
+        <div class="pv-mini">
+          <div><span>Del modelo</span><b>${pct < 1 ? pct.toFixed(2).replace(".", ",") : pct.toFixed(1).replace(".", ",")} %</b></div>
+          <div><span>Por ejemplo</span><b>${ent === 0 ? "—" : (porEjemplo < 1 ? porEjemplo.toFixed(2).replace(".", ",") : Math.round(porEjemplo).toLocaleString("es"))}</b></div>
+        </div>
+        <div class="veredicto ${estado}">
+          <b>${titulo}</b>
+          <p>${texto}</p>
         </div>`;
-      root.querySelector(".sim-note").innerHTML = i >= ETAPAS.length - 1
-        ? `<span class="bien">Ese es el punto: el conocimiento caro se paga una vez y se reutiliza indefinidamente.</span>`
-        : `Avanza para ver cómo se acumula el esfuerzo en cada enfoque.`;
+
+      root.querySelector('[data-sim-action="lora"]').textContent = st.lora ? "Desactivar LoRA" : "Activar LoRA";
+      root.querySelector(".sim-note").innerHTML = st.lora
+        ? `<span class="bien">LoRA activo:</span> las capas entrenables no ajustan sus pesos originales, sino unas matrices pequeñas añadidas. Por eso su cuenta cae a una fracción. Prueba a dejarlas todas entrenables y mira lo poco que sube el total.`
+        : `Las capas de arriba son las más generales; las de abajo, las más pegadas a la tarea con la que se preentrenó. Lo habitual es congelar las primeras y entrenar las últimas.`;
     }
 
+    root.addEventListener("click", (e) => {
+      const c = e.target.closest(".capa");
+      if (!c) return;
+      const i = Number(c.dataset.capa);
+      st.entrena[i] = !st.entrena[i];
+      pintar();
+    });
+
+    const range = root.querySelector(".sim-range");
+    const out = root.querySelector(".sim-out");
+    range.addEventListener("input", () => {
+      st.ej = EJEMPLOS[Number(range.value)];
+      out.textContent = fmtEj(st.ej);
+      pintar();
+    });
+
     return {
-      pintar,
       accion(a) {
-        if (a === "paso") { i = Math.min(i + 1, ETAPAS.length - 1); pintar(); }
-        if (a === "reiniciar") { i = -1; pintar(); }
+        if (a === "lora") { st.lora = !st.lora; pintar(); }
+        if (a === "reiniciar") {
+          st.entrena = [false, false, false, false, true];
+          st.lora = false; st.ej = 500; range.value = 6; out.textContent = "500";
+          pintar();
+        }
       },
       destruir() {},
-      iniciar() { i = 0; pintar(); },
+      iniciar: pintar,
     };
   },
 };
@@ -456,9 +561,8 @@ let simsActivas = [];
 function simHtml(id) {
   const s = SIMS[id];
   if (!s) return "";
-  const extra = s.extra || (id === "transferpipeline" ? `<div class="sim-pipeline"></div>` : "");
-  const html = simShell(id, s.titulo, s.desc, s.controles, extra);
-  return id === "transferpipeline" ? html.replace('<canvas class="sim-canvas"></canvas>', "") : html;
+  if (s.html) return s.html(id);
+  return simShell(id, s.titulo, s.desc, s.controles, s.extra || "");
 }
 
 function initSims(root) {

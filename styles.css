@@ -495,6 +495,34 @@ code{
 .cmp-pair td:first-child{ color:var(--text-2); font-weight:600; white-space:nowrap; }
 .cmp-pair th, .cmp-pair td{ width:33%; }
 
+/* ---------- 8c. Confusión frecuente ---------- */
+.confusion{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg);
+  padding:20px clamp(15px,3vw,23px); box-shadow:var(--shadow-sm);
+}
+.cf-t{
+  font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--warn); background:var(--warn-soft); border:1px solid var(--warn-line);
+  display:inline-block; padding:4px 10px; border-radius:6px; margin-bottom:15px;
+}
+.cf-cols{ display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+.cf-col{ border-radius:var(--r); padding:15px 17px; border:1px solid transparent; }
+.cf-a{ background:var(--primary-soft); border-color:var(--primary-line); }
+.cf-b{ background:var(--violet-soft); border-color:#ddd0f8; }
+.cf-col > b{ display:block; font-family:var(--ff-display); font-size:15.5px; margin-bottom:6px; }
+.cf-a > b{ color:var(--primary-dark); }
+.cf-col p b{ color:var(--text); }
+.cf-b > b{ color:var(--violet); }
+.cf-col p{ margin:0; font-size:14.2px; color:var(--text-2); line-height:1.55; }
+.cf-vs{
+  align-self:center; font-family:var(--ff-display); font-weight:700; font-size:13px;
+  color:var(--text-3); background:var(--surface-2); border-radius:100px; padding:6px 10px;
+}
+.cf-clave{
+  margin-top:15px; padding:13px 16px; background:var(--surface-2); border-radius:var(--r);
+  font-size:14.8px; font-weight:600; color:var(--text); text-align:center;
+}
+
 /* ---------- 9a. Simulaciones ---------- */
 .sim{
   background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg);
@@ -560,8 +588,73 @@ code{
 .pipe-body p{ font-size:13.6px; color:var(--text-2); margin:5px 0 0; }
 .pipe-nota{ display:block; font-size:12.5px; color:var(--primary-dark); margin-top:6px; font-style:italic; }
 
-/* la simulación de pipeline no usa canvas: una sola columna */
-.sim[data-sim="transferpipeline"] .sim-stage{ grid-template-columns:1fr 240px; }
+/* Deslizador de las simulaciones */
+.sim-slider{
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  background:var(--surface-2); border-radius:var(--r); padding:13px 17px; margin-bottom:16px;
+}
+.sim-slider label{ font-size:13.5px; font-weight:600; color:var(--text-2); }
+.sim-range{
+  flex:1; min-width:170px; height:6px; -webkit-appearance:none; appearance:none;
+  background:var(--surface-3); border-radius:100px; outline:none; cursor:pointer;
+}
+.sim-range::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
+  background:var(--primary); cursor:pointer; border:3px solid #fff; box-shadow:var(--shadow);
+}
+.sim-range::-moz-range-thumb{
+  width:20px; height:20px; border-radius:50%; background:var(--primary);
+  cursor:pointer; border:3px solid #fff; box-shadow:var(--shadow);
+}
+.sim-out{
+  font-family:var(--ff-display); font-weight:700; font-size:16px; color:var(--primary-dark);
+  background:var(--primary-soft); padding:3px 12px; border-radius:100px; min-width:64px; text-align:center;
+}
+
+/* Simulación: congelar o entrenar capas */
+.ajuste{ display:grid; grid-template-columns:1fr 290px; gap:16px; align-items:start; }
+.capas{ display:flex; flex-direction:column; gap:8px; }
+.capa{
+  display:flex; align-items:center; gap:13px; width:100%; text-align:left;
+  background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r);
+  padding:13px 15px; cursor:pointer; transition:.16s; font-family:inherit;
+}
+.capa:hover{ border-color:var(--primary-line); box-shadow:var(--shadow); }
+.capa.entrena{ background:var(--warn-soft); border-color:var(--warn-line); }
+.capa.congelada{ background:var(--surface); }
+.capa-ic{ font-size:18px; line-height:1; flex-shrink:0; }
+.capa-b{ flex:1; min-width:0; }
+.capa-b b{ display:block; font-family:var(--ff-display); font-size:14px; margin-bottom:2px; }
+.capa-d{ font-size:12.3px; color:var(--text-3); line-height:1.4; }
+.capa-p{ text-align:right; flex-shrink:0; }
+.capa-p em{ display:block; font-family:var(--ff-display); font-style:normal; font-weight:700; font-size:14.5px; }
+.capa.entrena .capa-p em{ color:var(--warn); }
+.capa.congelada .capa-p em{ color:var(--text-3); }
+.capa-p span{ font-size:10.8px; color:var(--text-3); }
+
+.panel{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--r); padding:17px 19px;
+}
+.pv span{ font-size:12.5px; color:var(--text-3); display:block; }
+.pv b{ font-family:var(--ff-display); font-size:26px; line-height:1.15; display:block; margin:2px 0; }
+.pv em{ font-size:12px; color:var(--text-3); font-style:normal; }
+.barra-capas{ height:9px; border-radius:100px; background:var(--surface-3); overflow:hidden; margin:13px 0 12px; }
+.barra-capas i{ display:block; height:100%; border-radius:100px; background:var(--warn); transition:width .35s ease; }
+.pv-mini{ display:grid; grid-template-columns:1fr 1fr; gap:10px; padding-bottom:14px; border-bottom:1px solid var(--border); }
+.pv-mini span{ font-size:11.5px; color:var(--text-3); display:block; }
+.pv-mini b{ font-family:var(--ff-display); font-size:16px; }
+
+.veredicto{ margin-top:14px; padding:13px 15px; border-radius:var(--r); border:1px solid transparent; }
+.veredicto b{ display:block; font-family:var(--ff-display); font-size:14.5px; margin-bottom:5px; }
+.veredicto p{ margin:0; font-size:13.4px; line-height:1.55; }
+.veredicto.bien{ background:var(--ok-soft); border-color:var(--ok-line); }
+.veredicto.bien b{ color:var(--ok); }
+.veredicto.medio{ background:var(--warn-soft); border-color:var(--warn-line); }
+.veredicto.medio b{ color:var(--warn); }
+.veredicto.mal{ background:var(--err-soft); border-color:var(--err-line); }
+.veredicto.mal b{ color:var(--err); }
+.veredicto p{ color:var(--text-2); }
 
 /* ---------- 9b. Ejercicios variados ---------- */
 .reto{
@@ -863,8 +956,13 @@ code{
   .tab-btn{ white-space:nowrap; }
   .level-card{ flex-direction:column; gap:14px; }
   .badges{ grid-template-columns:1fr 1fr; }
-  .sim-stage,
-  .sim[data-sim="transferpipeline"] .sim-stage{ grid-template-columns:1fr; }
+  .sim-stage{ grid-template-columns:1fr; }
+  .ajuste{ grid-template-columns:1fr; }
+  .capa-d{ display:none; }
+  .cf-cols{ grid-template-columns:1fr; gap:10px; }
+  .cf-vs{ justify-self:center; }
+  .sim-slider{ flex-direction:column; align-items:stretch; gap:10px; }
+  .sim-slider .sim-out{ align-self:flex-start; }
   .sim-controls .btn{ flex:1; }
   .rel-grid{ grid-template-columns:1fr; gap:8px; }
   .rel-col{ gap:8px; }
