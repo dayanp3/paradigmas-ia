@@ -23,6 +23,7 @@ const TOPICS = [
   /* ---------------------------------------------------- 1 */
   {
     id: "supervisado", num: 1,
+    sim: "perceptron",
     title: "Aprendizaje supervisado",
     tag: "Aprende de ejemplos que ya traen la respuesta correcta",
     nivel: "Básico", minutos: 8,
@@ -87,6 +88,7 @@ const TOPICS = [
   /* ---------------------------------------------------- 2 */
   {
     id: "no-supervisado", num: 2,
+    sim: "kmeans",
     title: "Aprendizaje no supervisado",
     tag: "Encuentra estructura oculta sin que nadie le diga qué buscar",
     nivel: "Básico", minutos: 8,
@@ -280,6 +282,7 @@ const TOPICS = [
   /* ---------------------------------------------------- 5 */
   {
     id: "transfer-learning", num: 5,
+    sim: "transferpipeline",
     title: "Transfer Learning y Fine-tuning",
     tag: "Reutilizar conocimiento ya aprendido en lugar de empezar de cero",
     nivel: "Intermedio", minutos: 12,
@@ -364,6 +367,7 @@ const TOPICS = [
   /* ---------------------------------------------------- 6 */
   {
     id: "refuerzo", num: 6,
+    sim: "gridworld",
     title: "Aprendizaje por refuerzo",
     tag: "Aprender por prueba, error y recompensa",
     nivel: "Intermedio", minutos: 9,

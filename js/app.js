@@ -440,6 +440,12 @@ function viewTema(t) {
       </div>
     </div>`);
 
+  /* Aprender haciendo: simulación interactiva */
+  if (t.sim) B.push(`<div class="block">
+      <div class="block-label">Aprender haciendo</div>
+      ${simHtml(t.sim)}
+    </div>`);
+
   /* Ejercicios de práctica */
   B.push(`
     <div class="block">
@@ -505,6 +511,7 @@ function render(route) {
 
   app.innerHTML = html + footHtml();
   app.querySelector(".view").classList.add("active");
+  initSims(app);
   currentRoute = route;
   syncNav(route);
   updateRing();
@@ -607,6 +614,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadState();
 
   document.body.addEventListener("click", (e) => {
+    if (manejarSim(e)) return;
     if (e.target.closest(".reto")) { if (manejarReto(e)) return; }
 
     const opt = e.target.closest(".quiz-opt");
