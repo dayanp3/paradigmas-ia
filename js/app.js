@@ -423,6 +423,25 @@ function viewTema(t) {
       <p class="diagram-caption">${t.diagram2Caption}</p>
     </div>`);
 
+  /* Video complementario. El reproductor se carga solo al pulsar:
+     así la página no arrastra el peso de YouTube en cada visita. */
+  if (t.video) B.push(`
+    <div class="block">
+      <div class="block-label">Video complementario</div>
+      <div class="video-card">
+        <button class="video-frame" data-yt="${t.video.yt}" aria-label="Reproducir: ${t.video.titulo}">
+          <img class="video-thumb" src="https://i.ytimg.com/vi/${t.video.yt}/maxresdefault.jpg" alt="" loading="lazy">
+          <span class="video-play" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+          </span>
+        </button>
+        <div class="video-meta">
+          <b>${t.video.titulo}</b>
+          <span>${t.video.desc}</span>
+        </div>
+      </div>
+    </div>`);
+
   /* Ejemplos en pestañas: cotidiano vs. IA */
   if (t.ejemploCotidiano && t.ejemploIA) B.push(`
     <div class="block" data-tabs>
@@ -527,6 +546,29 @@ function viewTema(t) {
     </div>
   </section>`;
 }
+
+/* ---------- Video complementario ---------- */
+function reproducirVideo(btn) {
+  const id = btn.dataset.yt;
+  const cont = document.createElement("div");
+  cont.className = "video-frame reproduciendo";
+  cont.innerHTML = `<iframe
+    src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1"
+    title="Video complementario del tema"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen></iframe>`;
+  btn.replaceWith(cont);
+}
+
+/* maxresdefault no existe en todos los videos: respaldo a hqdefault */
+document.addEventListener("error", (e) => {
+  const img = e.target;
+  if (img && img.classList && img.classList.contains("video-thumb") && !img.dataset.fallback) {
+    img.dataset.fallback = "1";
+    img.src = img.src.replace("maxresdefault", "hqdefault");
+  }
+}, true);
 
 /* ---------- Router ---------- */
 let currentRoute = "inicio";
@@ -656,6 +698,9 @@ document.addEventListener("DOMContentLoaded", () => {
   loadState();
 
   document.body.addEventListener("click", (e) => {
+    const vid = e.target.closest(".video-frame");
+    if (vid && !vid.classList.contains("reproduciendo")) { reproducirVideo(vid); return; }
+
     if (manejarSim(e)) return;
     if (e.target.closest(".reto")) { if (manejarReto(e)) return; }
 

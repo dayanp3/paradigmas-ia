@@ -315,6 +315,11 @@ const TOPICS = [
     diagramCaption: "Preentrenamiento general, modelo base, fine-tuning específico y modelo especializado.",
     diagram2: SVG_LORA,
     diagram2Caption: "LoRA: los pesos originales quedan congelados y solo se entrenan matrices pequeñas de bajo rango.",
+    video: {
+      yt: "rUmuX2jrGM8",
+      titulo: "Transfer Learning y Fine-tuning en video",
+      desc: "Un repaso audiovisual del tema, como complemento a la explicación escrita. Se reproduce aquí mismo.",
+    },
     examples: [
       { tag: "Visión", text: `Partir de un modelo preentrenado en <b>ImageNet</b> y ajustarlo con unos pocos miles de radiografías para detectar una patología.` },
       { tag: "Modelos de lenguaje", text: `Aplicar <b>LoRA</b> sobre un modelo abierto usando las conversaciones de soporte de una empresa, para crear un asistente especializado.` },
