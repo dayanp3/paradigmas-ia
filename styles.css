@@ -432,6 +432,63 @@ code{
   display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
 }
 
+/* ---------- 12b. Nivel, insignias y avisos ---------- */
+.s-of{ font-size:16px; color:var(--text-3); font-weight:500; }
+
+.level-card{
+  display:flex; gap:20px; align-items:flex-start; margin-bottom:22px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--r-lg); padding:22px 24px; box-shadow:var(--shadow-sm);
+}
+.level-badge{
+  flex-shrink:0; width:54px; height:54px; border-radius:15px;
+  background:linear-gradient(135deg, var(--primary), var(--violet));
+  color:#fff; font-family:var(--ff-display); font-size:24px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow);
+}
+.level-body{ flex:1; min-width:0; }
+.level-top{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+.level-top h3{ font-size:18px; }
+.level-pts{
+  font-size:12.5px; font-weight:600; color:var(--primary-dark);
+  background:var(--primary-soft); padding:3px 10px; border-radius:100px;
+}
+.level-desc{ font-size:14.3px; color:var(--text-2); margin:5px 0 4px; }
+.level-next{ font-size:12.8px; color:var(--text-3); }
+.level-next b{ color:var(--text-2); }
+
+.badges{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:12px; }
+.badge{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r);
+  padding:16px; text-align:center; opacity:.55; transition:.18s;
+}
+.badge.on{
+  opacity:1; border-color:var(--primary-line); background:var(--surface);
+  box-shadow:var(--shadow-sm);
+}
+.badge-ico{ font-size:26px; line-height:1; margin-bottom:9px; filter:grayscale(1); }
+.badge.on .badge-ico{ filter:none; }
+.badge-t{ font-family:var(--ff-display); font-weight:700; font-size:14px; margin-bottom:4px; }
+.badge.on .badge-t{ color:var(--primary-dark); }
+.badge-d{ font-size:12.2px; color:var(--text-3); line-height:1.45; }
+
+/* Avisos flotantes */
+.toasts{
+  position:fixed; right:18px; bottom:18px; z-index:200;
+  display:flex; flex-direction:column; gap:10px; pointer-events:none;
+}
+.toast{
+  display:flex; align-items:center; gap:13px; min-width:250px; max-width:330px;
+  background:var(--surface); border:1px solid var(--primary-line);
+  border-radius:var(--r); padding:13px 17px; box-shadow:var(--shadow-md);
+  transform:translateY(14px); opacity:0; transition:.32s ease;
+}
+.toast.in{ transform:none; opacity:1; }
+.toast .t-icon{ font-size:22px; line-height:1; flex-shrink:0; }
+.toast .t-body{ display:flex; flex-direction:column; min-width:0; }
+.toast .t-body b{ font-size:14px; }
+.toast .t-body span{ font-size:12.8px; color:var(--text-2); }
+
 /* ---------- 13b. Componentes pedagógicos ---------- */
 
 /* "En una frase" */
@@ -553,6 +610,10 @@ code{
   .concept b{ flex:none; }
   .tabs{ overflow-x:auto; }
   .tab-btn{ white-space:nowrap; }
+  .level-card{ flex-direction:column; gap:14px; }
+  .badges{ grid-template-columns:1fr 1fr; }
+  .toasts{ left:14px; right:14px; bottom:14px; }
+  .toast{ max-width:none; min-width:0; }
   .prevnext{ flex-direction:column; }
   .pn.next{ text-align:left; }
   .view-head{ padding:30px 0 20px; }

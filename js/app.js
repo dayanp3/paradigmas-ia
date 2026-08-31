@@ -19,9 +19,12 @@ const I = {
 const STORE_KEY = "paradigmas-ia:v1";
 
 const State = {
-  visited: {},   // { topicId: true }
-  answers: {},   // { "topicId:i": true|false }
+  visited: {},        // { topicId: true }
+  answers: {},        // { "topicId:i": true|false }
   points: 0,
+  premiados: {},      // temas cuyo bono de finalización ya se otorgó
+  racha: 0,           // días consecutivos con actividad
+  ultimoDia: null,    // último día con actividad (YYYY-MM-DD)
 };
 
 function loadState() {
@@ -33,6 +36,9 @@ function loadState() {
       State.visited = d.visited || {};
       State.answers = d.answers || {};
       State.points = Number(d.points) || 0;
+      State.premiados = d.premiados || {};
+      State.racha = Number(d.racha) || 0;
+      State.ultimoDia = d.ultimoDia || null;
     }
   } catch (e) { /* almacenamiento no disponible: se sigue sin persistir */ }
 }
@@ -188,7 +194,7 @@ function viewEjercicios() {
     <div class="stat-row">
       <div class="stat"><div class="s-lbl">Respondidas</div><div class="s-val">${answeredCount()}</div><div class="s-sub">de ${totalQuestions()} preguntas</div></div>
       <div class="stat"><div class="s-lbl">Correctas</div><div class="s-val">${correctCount()}</div><div class="s-sub">${answeredCount() ? Math.round(correctCount() / answeredCount() * 100) : 0}% de acierto</div></div>
-      <div class="stat"><div class="s-lbl">Puntos</div><div class="s-val">${State.points}</div><div class="s-sub">10 por acierto nuevo</div></div>
+      <div class="stat"><div class="s-lbl">Puntos</div><div class="s-val">${State.points}</div><div class="s-sub">${PTS_ACIERTO} por acierto, ${PTS_TEMA} por tema</div></div>
     </div>
     <div class="section-title"><h2>Por tema</h2><span>Toca uno para practicar</span></div>
     <div class="checklist">${filas}</div>
@@ -200,6 +206,14 @@ function viewProgreso() {
   const pct = Math.round(overallProgress() * 100);
   const completos = TOPICS.filter(topicDone).length;
   const leidos = TOPICS.filter(t => State.visited[t.id]).length;
+  const nivel = nivelActual(State.points);
+  const sig = nivelSiguiente(State.points);
+  const ganadas = badgesGanadas().map(b => b.id);
+
+  // avance dentro del nivel actual
+  const base = nivel.min;
+  const techo = sig ? sig.min : nivel.min;
+  const pctNivel = sig ? Math.round(((State.points - base) / (techo - base)) * 100) : 100;
 
   const filas = TOPICS.map(t => {
     const p = Math.round(topicProgress(t) * 100);
@@ -208,6 +222,16 @@ function viewProgreso() {
       <span class="check-box">${I.check}</span>
       <span class="cr-t">${t.num}. ${t.title}</span>
       <span class="chip ${topicDone(t) ? "chip-done" : "chip-time"}">${p}%</span>
+    </div>`;
+  }).join("");
+
+  const insignias = BADGES.map(b => {
+    const on = ganadas.includes(b.id);
+    return `
+    <div class="badge ${on ? "on" : ""}" title="${b.d}">
+      <div class="badge-ico">${on ? b.icon : "🔒"}</div>
+      <div class="badge-t">${b.t}</div>
+      <div class="badge-d">${b.d}</div>
     </div>`;
   }).join("");
 
@@ -226,19 +250,38 @@ function viewProgreso() {
       <p>Se guarda en este navegador y en este dispositivo. Si abres el sitio en otro equipo, el avance empieza de cero.</p>
     </div>
 
+    <div class="level-card">
+      <div class="level-badge">${nivel.n}</div>
+      <div class="level-body">
+        <div class="level-top">
+          <h3>Nivel ${nivel.n} · ${nivel.t}</h3>
+          <span class="level-pts">${State.points} puntos</span>
+        </div>
+        <p class="level-desc">${nivel.d}</p>
+        <div class="bigbar"><i style="width:${pctNivel}%"></i></div>
+        <div class="level-next">${sig
+          ? `Te faltan <b>${sig.min - State.points} puntos</b> para el nivel ${sig.n}: ${sig.t}`
+          : `Has alcanzado el nivel máximo.`}</div>
+      </div>
+    </div>
+
     <div class="stat-row">
       <div class="stat">
         <div class="s-lbl">Avance general</div>
         <div class="s-val">${pct}%</div>
         <div class="bigbar"><i style="width:${pct}%"></i></div>
       </div>
-      <div class="stat"><div class="s-lbl">Temas completados</div><div class="s-val">${completos} <span style="font-size:16px;color:var(--text-3)">/ 9</span></div><div class="s-sub">leídos y con ejercicios resueltos</div></div>
-      <div class="stat"><div class="s-lbl">Temas leídos</div><div class="s-val">${leidos} <span style="font-size:16px;color:var(--text-3)">/ 9</span></div><div class="s-sub">al menos una visita</div></div>
-      <div class="stat"><div class="s-lbl">Puntos</div><div class="s-val">${State.points}</div><div class="s-sub">${correctCount()} respuestas correctas</div></div>
+      <div class="stat"><div class="s-lbl">Temas completados</div><div class="s-val">${completos} <span class="s-of">/ 9</span></div><div class="s-sub">leídos y con ejercicios resueltos</div></div>
+      <div class="stat"><div class="s-lbl">Ejercicios correctos</div><div class="s-val">${correctCount()} <span class="s-of">/ ${totalQuestions()}</span></div><div class="s-sub">${answeredCount()} respondidos</div></div>
+      <div class="stat"><div class="s-lbl">Racha</div><div class="s-val">${State.racha || 0} <span class="s-of">${(State.racha || 0) === 1 ? "día" : "días"}</span></div><div class="s-sub">días seguidos estudiando</div></div>
     </div>
 
     ${vacio}
-    <div class="section-title"><h2>Detalle por tema</h2><span>Toca uno para continuar</span></div>
+
+    <div class="section-title"><h2>Insignias</h2><span>${ganadas.length} de ${BADGES.length} obtenidas</span></div>
+    <div class="badges">${insignias}</div>
+
+    <div class="section-title" style="margin-top:34px"><h2>Detalle por tema</h2><span>Toca uno para continuar</span></div>
     <div class="checklist">${filas}</div>
   </section>`;
 }
@@ -529,12 +572,23 @@ function handleQuizClick(btn) {
   fb.innerHTML = `<b>${ok ? "Correcto" : "No exactamente"}</b>${item.exp}`;
 
   const key = `${t.id}:${qi}`;
-  if (State.answers[key] === undefined) {
-    State.answers[key] = ok;
-    if (ok) State.points += 10;
-    saveState();
-    updateRing();
+  if (State.answers[key] !== undefined) return;
+
+  const antes = snapshotLogros();
+  State.answers[key] = ok;
+  if (ok) State.points += PTS_ACIERTO;
+
+  // Bono por completar el tema entero, una sola vez
+  if (topicDone(t) && !State.premiados[t.id]) {
+    State.premiados[t.id] = true;
+    State.points += PTS_TEMA;
+    toast("Tema completado", `${t.title} · +${PTS_TEMA} puntos`, "✅");
   }
+
+  registrarActividad();
+  saveState();
+  updateRing();
+  revisarLogros(antes);
 }
 
 /* ---------- Arranque ---------- */
