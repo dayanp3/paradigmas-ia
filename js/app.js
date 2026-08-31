@@ -288,6 +288,47 @@ function viewProgreso() {
   </section>`;
 }
 
+/* ---------- Vista: Comparar ---------- */
+function viewComparar() {
+  const tabla = `
+    <div class="table-wrap">
+      <table class="data-table cmp-table">
+        <thead><tr>${TABLA_COMPARATIVA.columnas.map(c => `<th>${c}</th>`).join("")}</tr></thead>
+        <tbody>${TABLA_COMPARATIVA.filas.map(f => `<tr>${f.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>
+      </table>
+    </div>`;
+
+  const pares = COMPARACIONES.map(c => `
+    <div class="cmp-card" id="cmp-${c.id}">
+      <div class="cmp-head">
+        <h3>${c.t}</h3>
+        <p>${c.d}</p>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table cmp-pair">
+          <thead><tr><th>Aspecto</th><th class="col-a">${c.a}</th><th class="col-b">${c.b}</th></tr></thead>
+          <tbody>${c.filas.map(f => `
+            <tr><td>${f[0]}</td><td class="col-a">${f[1]}</td><td class="col-b">${f[2]}</td></tr>`).join("")}</tbody>
+        </table>
+      </div>
+    </div>`).join("");
+
+  return `
+  <section class="view" id="v-comparar">
+    <div class="view-head">
+      <div class="eyebrow">Ver las diferencias</div>
+      <h1>Comparar</h1>
+      <p>Muchos de estos paradigmas se confunden entre sí. Aquí están puestos lado a lado, empezando por la pregunta que mejor los separa: ¿usa etiquetas?</p>
+    </div>
+
+    <div class="section-title"><h2>Los nueve, de un vistazo</h2><span>Desliza la tabla si no cabe</span></div>
+    ${tabla}
+
+    <div class="section-title" style="margin-top:38px"><h2>Contrastes que suelen confundirse</h2><span>4 comparaciones</span></div>
+    <div class="cmp-list">${pares}</div>
+  </section>`;
+}
+
 /* ---------- Vista: detalle de un tema ---------- */
 function railHtml(activeId) {
   return `
@@ -503,6 +544,7 @@ function render(route) {
     switch (route) {
       case "temas":      html = viewTemas(); break;
       case "ruta":       html = viewRuta(); break;
+      case "comparar":   html = viewComparar(); break;
       case "ejercicios": html = viewEjercicios(); break;
       case "progreso":   html = viewProgreso(); break;
       default:           html = viewInicio(); route = "inicio";

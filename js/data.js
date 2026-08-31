@@ -881,3 +881,80 @@ const RETOS = {
 
 /* Adjunta cada mini evaluación a su tema */
 TOPICS.forEach(t => { t.reto = RETOS[t.id] || []; });
+
+/* =========================================================
+   Comparaciones — tabla general y contrastes por pares
+   ========================================================= */
+
+const TABLA_COMPARATIVA = {
+  columnas: ["Paradigma", "¿Usa etiquetas?", "Señal que lo guía", "Qué produce"],
+  filas: [
+    ["Aprendizaje supervisado", "Sí, en todos los ejemplos", "La etiqueta correcta provista por humanos", "Predicción de una categoría o un valor"],
+    ["Aprendizaje no supervisado", "No", "La similitud o distancia entre los datos", "Grupos o representaciones más simples"],
+    ["Aprendizaje semisupervisado", "Solo en una pequeña parte", "Pocas etiquetas más la estructura del resto", "Clasificador entrenado con pocas etiquetas"],
+    ["Aprendizaje autosupervisado", "Generadas del propio dato", "La parte del dato que se ocultó", "Representaciones transferibles a otras tareas"],
+    ["Transfer Learning / Fine-tuning", "Sí, pocas, en la fase de ajuste", "Las etiquetas de la tarea nueva", "Modelo especializado a partir de uno general"],
+    ["Aprendizaje por refuerzo", "No", "La recompensa que devuelve el entorno", "Una política de decisión"],
+    ["Alineación RLHF / RLAIF", "No: preferencias, no etiquetas", "Comparaciones entre respuestas", "Modelo alineado con las preferencias"],
+    ["Aprendizaje en contexto", "Ejemplos dentro del prompt", "Ninguna: no hay entrenamiento", "Respuesta que sigue el patrón mostrado"],
+    ["Modelos del mundo", "No necesariamente", "Las transiciones observadas del entorno", "Un simulador interno para planificar"],
+  ],
+};
+
+const COMPARACIONES = [
+  {
+    id: "sup-nosup",
+    t: "Supervisado frente a no supervisado",
+    d: "La distinción más básica de todas, y la que ordena el resto del mapa.",
+    a: "Aprendizaje supervisado", b: "Aprendizaje no supervisado",
+    filas: [
+      ["¿Hay respuesta correcta?", "Sí, viene con cada ejemplo", "No existe ninguna"],
+      ["Quién aporta la señal", "Una persona que etiquetó los datos", "La propia estructura de los datos"],
+      ["Objetivo", "Predecir la etiqueta de casos nuevos", "Descubrir la organización interna"],
+      ["Cómo se valida", "Métricas objetivas contra las etiquetas", "Métricas internas y juicio experto"],
+      ["Ejemplo típico", "Filtro de spam", "Segmentación de clientes"],
+    ],
+  },
+  {
+    id: "tl-ft",
+    t: "Transfer Learning frente a Fine-tuning",
+    d: "Se usan como sinónimos con frecuencia, y no lo son. Uno contiene al otro.",
+    a: "Transfer Learning", b: "Fine-tuning",
+    filas: [
+      ["Qué es", "La estrategia general de reutilizar conocimiento", "Una técnica concreta dentro de esa estrategia"],
+      ["¿Modifica los pesos?", "No necesariamente", "Sí, por definición"],
+      ["Alcance", "Incluye usar el modelo como extractor de características", "Solo el caso en que se continúa el entrenamiento"],
+      ["Relación", "Contiene al fine-tuning", "Es un caso particular de transfer learning"],
+      ["Frase para recordarlo", "Todo fine-tuning es transfer learning…", "…pero no todo transfer learning es fine-tuning"],
+    ],
+  },
+  {
+    id: "rlhf-rlaif",
+    t: "RLHF frente a RLAIF",
+    d: "Mismo esquema técnico, evaluador distinto. Y de ahí se derivan todas las demás diferencias.",
+    a: "RLHF", b: "RLAIF",
+    filas: [
+      ["Quién evalúa", "Personas", "Otro modelo de IA"],
+      ["Criterio de evaluación", "El juicio de cada evaluador", "Una constitución de principios escritos"],
+      ["Costo y velocidad", "Alto y lento", "Bajo y escalable"],
+      ["Consistencia", "Variable entre evaluadores", "Alta, pero limitada por la constitución"],
+      ["Riesgo principal", "Subjetividad e inconsistencia", "Que la constitución o el evaluador estén mal calibrados"],
+      ["Qué comparten", "Modelo de recompensa y ajuste por refuerzo", "Modelo de recompensa y ajuste por refuerzo"],
+    ],
+  },
+  {
+    id: "icl-ft",
+    t: "Aprendizaje en contexto frente a Fine-tuning",
+    d: "Las dos formas de adaptar un modelo a tu tarea. La diferencia de fondo es dónde queda lo aprendido.",
+    a: "Aprendizaje en contexto", b: "Fine-tuning",
+    filas: [
+      ["¿Se modifican los pesos?", "No, ninguno", "Sí"],
+      ["Duración del efecto", "Solo esa conversación", "Permanente"],
+      ["Qué necesitas", "Solo escribir el prompt", "Datos preparados y cómputo"],
+      ["Costo inicial", "Ninguno", "Entrenamiento completo o PEFT"],
+      ["Costo por consulta", "Mayor: el prompt ocupa contexto", "Menor: el conocimiento está en los pesos"],
+      ["Límite principal", "El tamaño de la ventana de contexto", "El costo de reentrenar cuando algo cambia"],
+      ["Cuándo elegirlo", "Prototipar y tareas puntuales", "Comportamiento estable y repetido a gran escala"],
+    ],
+  },
+];
