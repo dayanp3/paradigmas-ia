@@ -386,14 +386,15 @@ const SIM_GRID = {
 /* =========================================================
    4. El caso del hospital
 
-   Todo el ejercicio se apoya en una sola metáfora: un modelo es
-   una máquina con millones de perillas, y entrenarlo es girarlas
-   hasta que acierte. Con eso, "congelar una capa" pasa a ser
-   "dejar esas perillas quietas" y no hace falta saber qué es un
-   parámetro ni una capa para poder jugar.
+   Todo el ejercicio se apoya en una sola metáfora: el modelo es
+   un empleado que ya sabe el oficio —lleva años mirando fotos—
+   y el hospital lo contrata para mirar radiografías. Con eso,
+   "congelar una capa" pasa a ser "eso ya lo sabe, no se lo
+   vuelvas a enseñar", y no hace falta saber qué es un parámetro
+   ni una capa para poder jugar.
 
-   La aritmética es real: las perillas se suman de verdad y la
-   relación perillas-por-ejemplo se calcula de verdad.
+   La aritmética es real: los parámetros se suman de verdad y la
+   relación parámetros-por-ejemplo se calcula de verdad.
    ========================================================= */
 const SIM_TRANSFER = {
   titulo: "El caso del hospital",
@@ -409,19 +410,19 @@ const SIM_TRANSFER = {
       <div class="brief">
         <div class="brief-fila">
           <span class="brief-n">1</span>
-          <p>Un modelo de IA es como una <b>máquina con millones de perillas</b>. Entrenarlo es girar esas perillas hasta que acierte.</p>
+          <p>Este modelo es como <b>un empleado que lleva años mirando fotos</b>: ya sabe distinguir bordes, formas y objetos.</p>
         </div>
         <div class="brief-fila">
           <span class="brief-n">2</span>
-          <p>Este modelo ya viene con sus <b>96,6 millones de perillas puestas</b> para reconocer objetos en fotos: perros, sillas, coches.</p>
+          <p>Ese oficio son <b>96,6 millones de detalles</b> que aprendió mirando perros, sillas y coches.</p>
         </div>
         <div class="brief-fila">
           <span class="brief-n">3</span>
-          <p>Un hospital quiere usarlo para <b>detectar neumonía en radiografías</b>. Tú decides qué perillas dejas quietas y cuáles vuelves a ajustar.</p>
+          <p>Un hospital lo contrata para <b>detectar neumonía en radiografías</b>. Tú decides qué le dejas como está y qué le toca reaprender.</p>
         </div>
         <div class="brief-fila destacada">
           <span class="brief-n">!</span>
-          <p><b>El problema:</b> cada perilla que muevas hay que ajustarla con ejemplos. Y el hospital tiene pocas radiografías.</p>
+          <p><b>El problema:</b> cada cosa que le hagas reaprender hay que enseñársela con radiografías, y el hospital tiene pocas.</p>
         </div>
       </div>
 
@@ -443,10 +444,10 @@ const SIM_TRANSFER = {
     /* Cada bloque, descrito por lo que HACE, no por su nombre técnico */
     const CAPAS = [
       { t: "Ve bordes y manchas",        d: "Lo más básico. Un borde se ve igual en una foto que en una radiografía: esto ya lo sabe hacer.",  p: 18.4e6 },
-      { t: "Ve formas",                   d: "Junta bordes para formar figuras. Todavía sirve para cualquier imagen.",                          p: 24.1e6 },
-      { t: "Ve objetos y sus partes",     d: "Aquí ya está pensado para fotos de cosas cotidianas: ruedas, patas, ventanas.",                    p: 31.7e6 },
-      { t: "Entiende la imagen completa", d: "Muy pegado a las fotos con las que aprendió. A una radiografía no le sirve igual.",                p: 22.3e6 },
-      { t: "Da su respuesta final",       d: "Hoy responde 'perro' o 'silla'. Necesitas que responda 'neumonía' o 'sano'.",                      p: 0.082e6 },
+      { t: "Ve formas",                   d: "Junta bordes para formar figuras. Todavía le sirve para cualquier imagen.",                       p: 24.1e6 },
+      { t: "Ve objetos y sus partes",     d: "Aquí ya está acostumbrado a fotos de cosas cotidianas: ruedas, patas, ventanas.",                  p: 31.7e6 },
+      { t: "Entiende la imagen completa", d: "Muy pegado a las fotos con las que aprendió el oficio. A una radiografía no le sirve igual.",      p: 22.3e6 },
+      { t: "Da su respuesta final",       d: "Hoy responde “perro” o “silla”. Necesitas que responda “neumonía” o “sano”.",                      p: 0.082e6 },
     ];
     const TOTAL = CAPAS.reduce((a, c) => a + c.p, 0);
     const LORA_FRAC = 0.003;
@@ -456,51 +457,51 @@ const SIM_TRANSFER = {
         n: "Reto 1",
         titulo: "Lo mínimo para que sirva",
         ej: 800,
-        tarea: `Ahora mismo el modelo responde <b>"perro"</b> o <b>"silla"</b>. Necesitas que responda <b>"neumonía"</b> o <b>"sano"</b>. Vuelve a ajustar <b>solo el último bloque</b>, el que da la respuesta, y deja todos los demás quietos.`,
-        pista: `Toca un bloque para cambiarlo entre quieto y "hay que ajustarlo".`,
+        tarea: `Ahora mismo el empleado responde <b>“perro”</b> o <b>“silla”</b>. Necesitas que responda <b>“neumonía”</b> o <b>“sano”</b>. Haz que reaprenda <b>solo el último bloque</b>, el que da la respuesta, y déjale todo lo demás como está.`,
+        pista: `Toca un bloque para cambiarlo entre “ya lo sabe” y “esto lo reaprende”.`,
         ok: (st, m) => !st.lora && !st.entrena[0] && !st.entrena[1] && !st.entrena[2] && !st.entrena[3] && st.entrena[4],
-        bien: `Correcto. Solo mueves <b>82 mil perillas</b> y tienes 800 radiografías para hacerlo: unas 100 perillas por ejemplo. Es poco y alcanza. Todo lo que el modelo ya sabía sobre ver imágenes se aprovecha tal cual, y solo le enseñas a dar la respuesta nueva.`,
+        bien: `Correcto. Solo le haces reaprender <b>82 mil detalles</b> y tienes 800 radiografías para enseñárselos: unos 100 detalles por radiografía. Es poco y alcanza. Todo lo que ya sabía sobre mirar imágenes se aprovecha tal cual; lo único nuevo es la respuesta que tiene que dar.`,
         mal: (st, m) => {
-          if (m.ent === 0) return `No estás moviendo ninguna perilla, así que el modelo seguirá respondiendo "perro". Toca el último bloque, el que da la respuesta.`;
-          if (st.lora) return `Las perillas están bien elegidas, pero LoRA aquí no hace falta: el último bloque ya es pequeño. Desactívalo.`;
-          return `Estás moviendo demasiadas: <b>${m.entTxt} perillas</b> con solo 800 radiografías. Deja quietos todos los bloques menos el último.`;
+          if (m.ent === 0) return `No le estás pidiendo que reaprenda nada, así que seguirá respondiendo “perro”. Toca el último bloque, el que da la respuesta.`;
+          if (st.lora) return `Elegiste bien qué reaprender, pero LoRA aquí no hace falta: dar la respuesta final ya es una tarea pequeña. Desactívalo.`;
+          return `Le estás pidiendo reaprender demasiado: <b>${m.entTxt} de detalles</b> con solo 800 radiografías. Déjale todo como está menos el último bloque.`;
         },
       },
       {
         n: "Reto 2",
         titulo: "Que mire mejor las radiografías",
         ej: 800,
-        tarea: `Con eso el modelo responde lo correcto, pero <b>sigue mirando la radiografía como si fuera la foto de un objeto</b>. Haz que el cuarto bloque —el que entiende la imagen completa— también se ajuste, sin que el semáforo se ponga en rojo.`,
-        pista: `Actívalo y mira el semáforo. Si se pone en rojo, no lo vuelvas a apagar: hay otra forma de bajar las perillas.`,
+        tarea: `Con eso ya responde lo correcto, pero <b>sigue mirando la radiografía como si fuera la foto de un objeto</b>. Haz que también reaprenda el cuarto bloque —el que entiende la imagen completa— sin que el semáforo se ponga en rojo.`,
+        pista: `Actívalo y mira el semáforo. Si se pone en rojo, no lo vuelvas a apagar: hay otra forma de que le cueste menos.`,
         ok: (st, m) => st.entrena[3] && m.estado === "bien",
-        bien: `Eso es, y aquí está la idea de <b>LoRA</b>: en lugar de mover los 22,3 millones de perillas que ese bloque ya tiene puestas, le añade <b>unas pocas perillas nuevas</b> y solo mueve esas. Pasas de 22,3 millones a <b>149 mil</b>, y con 800 radiografías eso sí es asumible.`,
+        bien: `Eso es, y aquí está la idea de <b>LoRA</b>: en vez de mandarlo a reaprender desde cero los 22,3 millones de detalles de ese bloque, <b>le das una guía corta al lado</b> que consulta mientras trabaja. Solo hay que enseñarle esa guía: pasas de 22,3 millones a <b>149 mil</b>, y con 800 radiografías eso sí es asumible.`,
         mal: (st, m) => {
-          if (!st.entrena[3]) return `El cuarto bloque sigue quieto, así que sigue mirando la radiografía como una foto. Actívalo.`;
-          if (!st.lora) return `Ya se ajusta, pero mira el semáforo: <b>${m.porEjTxt} perillas por radiografía</b>. Le estás pidiendo que reaprenda 22 millones de cosas con 800 ejemplos, y con eso solo puede adivinar. Prueba el botón <b>Usar LoRA</b>.`;
-          return `Con LoRA vas bien, pero tienes demasiados bloques activados a la vez: ${m.porEjTxt} perillas por radiografía. Deja solo el cuarto bloque y el último.`;
+          if (!st.entrena[3]) return `El cuarto bloque sigue como estaba, así que sigue mirando la radiografía como una foto. Actívalo.`;
+          if (!st.lora) return `Ya lo reaprende, pero mira el semáforo: <b>${m.porEjTxt} detalles por radiografía</b>. Le estás pidiendo reaprender 22 millones de cosas con 800 ejemplos, y con eso solo puede adivinar. Prueba el botón <b>Usar LoRA</b>.`;
+          return `Con LoRA vas bien, pero le estás pidiendo reaprender demasiados bloques a la vez: ${m.porEjTxt} detalles por radiografía. Deja solo el cuarto bloque y el último.`;
         },
       },
       {
         n: "Reto 3",
-        titulo: "Ajustarlo entero con un solo computador",
+        titulo: "Adaptarlo entero con un solo computador",
         ej: 800,
-        tarea: `Quieres que <b>los cinco bloques</b> se adapten a las radiografías. Pero el hospital tiene un solo computador con tarjeta gráfica: consigue que todos se ajusten moviendo <b>menos de 500 mil perillas</b> en total.`,
+        tarea: `Quieres que <b>los cinco bloques</b> se adapten a las radiografías. Pero el hospital tiene un solo computador con tarjeta gráfica: consigue que todos se adapten reaprendiendo <b>menos de 500 mil detalles</b> en total.`,
         pista: `Actívalos todos. Los 96,6 millones no caben; hay una forma de que sí quepan.`,
         ok: (st, m) => st.entrena.every(Boolean) && m.ent < 500000,
-        bien: `Ahí está el porqué de LoRA. Los cinco bloques se adaptan y aun así solo mueves <b>372 mil perillas</b>: el 0,39 % del modelo. Sin LoRA serían 96,6 millones y no cabrían en ese computador. El artículo original de LoRA reporta hasta <b>10.000 veces menos perillas</b> que ajustarlo todo.`,
+        bien: `Ahí está el porqué de LoRA. Los cinco bloques se adaptan y aun así solo hay que enseñarle <b>372 mil detalles</b>: el 0,39 % de lo que sabe. Sin LoRA serían 96,6 millones y no cabrían en ese computador. El artículo original de LoRA reporta hasta <b>10.000 veces menos</b> que reentrenarlo todo.`,
         mal: (st, m) => {
-          if (!st.entrena.every(Boolean)) return `Todavía quedan bloques quietos. El reto pide que se ajusten los cinco.`;
-          return `Los cinco se ajustan, pero son <b>${m.entTxt} perillas</b>, muy por encima del límite de 500 mil. Activa <b>LoRA</b>.`;
+          if (!st.entrena.every(Boolean)) return `Todavía hay bloques que le dejaste como estaban. El reto pide que se adapten los cinco.`;
+          return `Los cinco se adaptan, pero le estás pidiendo reaprender <b>${m.entTxt} de detalles</b>, muy por encima del límite de 500 mil. Activa <b>LoRA</b>.`;
         },
       },
       {
         n: "Reto 4",
         titulo: "Cuando ya no faltan radiografías",
         ej: 60000,
-        tarea: `Pasan los años y el hospital acumula <b>60.000 radiografías</b> diagnosticadas. Ahora sí puede permitirse ajustar el modelo entero a la antigua. <b>Activa los cinco bloques y apaga LoRA</b>: mira cómo cambia el semáforo.`,
-        pista: `Son exactamente las mismas perillas del reto 3. Lo único distinto es cuántos ejemplos hay.`,
+        tarea: `Pasan los años y el hospital acumula <b>60.000 radiografías</b> diagnosticadas. Ahora sí puede permitirse mandarlo a reaprender el oficio entero, a la antigua. <b>Activa los cinco bloques y apaga LoRA</b>: mira cómo cambia el semáforo.`,
+        pista: `Le estás pidiendo exactamente lo mismo que en el reto 3. Lo único distinto es cuántas radiografías hay para enseñárselo.`,
         ok: (st, m) => st.entrena.every(Boolean) && !st.lora && m.estado !== "mal",
-        bien: `Correcto, y esta es la otra cara del tema. Mueves los mismos <b>96,6 millones</b> de perillas que en el reto 3, pero ahora hay 60.000 radiografías para ajustarlas: bajas a <b>{POR} por ejemplo</b> y el semáforo deja de estar en rojo. <b>Transferir sirve sobre todo cuando faltan datos</b>; cuando sobran, la ventaja se encoge.`,
+        bien: `Correcto, y esta es la otra cara del tema. Le haces reaprender los mismos <b>96,6 millones</b> de detalles que en el reto 3, pero ahora hay 60.000 radiografías para enseñárselos: bajas a <b>{POR} por radiografía</b> y el semáforo deja de estar en rojo. <b>Transferir sirve sobre todo cuando faltan datos</b>; cuando sobran, la ventaja se encoge.`,
         mal: (st, m) => {
           if (st.lora) return `El reto pide hacerlo <b>sin</b> LoRA, para poder comparar con el reto 3. Desactívalo.`;
           if (!st.entrena.every(Boolean)) return `Faltan bloques por activar: el reto pide los cinco.`;
@@ -533,7 +534,7 @@ const SIM_TRANSFER = {
       root.querySelector(".reto-caja").innerHTML = fin ? `
         <div class="reto-hd completado">
           <div class="reto-n">Los 4 retos resueltos</div>
-          <p>La regla que resume el tema: <b>deja quieto lo que ya sabe, ajusta solo lo que le falta, y usa LoRA cuando no te alcancen ni los datos ni el computador.</b></p>
+          <p>La regla que resume el tema: <b>déjale quieto lo que ya sabe hacer, reenséñale solo lo que le falta, y usa LoRA cuando no te alcancen ni las radiografías ni el computador.</b></p>
           <button class="btn btn-secondary btn-sm" data-sim-action="volver">Empezar de nuevo</button>
         </div>` : `
         <div class="reto-hd">
@@ -559,31 +560,31 @@ const SIM_TRANSFER = {
         <button class="capa ${on ? "entrena" : "congelada"}" data-capa="${i}">
           <span class="capa-ic">${on ? "🔧" : "🔒"}</span>
           <span class="capa-b"><b>${c.t}</b><span class="capa-d">${c.d}</span></span>
-          <span class="capa-p"><em>${on ? fmt(p) : "quieto"}</em>
-            <span>${on ? "perillas a mover" : "no se toca"}</span></span>
+          <span class="capa-p"><em>${on ? fmt(p) : "ya lo sabe"}</em>
+            <span>${on ? "por reenseñar" : "no se lo enseñas"}</span></span>
         </button>`;
       }).join("");
 
       const etiqueta = {
-        vacio: ["No estás ajustando nada", "El modelo seguiría respondiendo “perro”."],
-        mal:   ["Demasiadas perillas, muy pocos ejemplos", "Con tan pocos ejemplos por perilla el modelo solo puede adivinar."],
+        vacio: ["No le estás pidiendo que reaprenda nada", "Seguiría respondiendo “perro”."],
+        mal:   ["Demasiado que reaprender, muy pocas radiografías", "Con tan pocos ejemplos por cada detalle, el modelo solo puede adivinar."],
         medio: ["Justo, pero puede salir", "Está en el límite. Vigílalo."],
-        bien:  ["Bien equilibrado", "Hay ejemplos suficientes para las perillas que mueves."],
+        bien:  ["Bien equilibrado", "Hay radiografías suficientes para lo que le estás pidiendo reaprender."],
       }[m.estado];
 
       root.querySelector(".panel").innerHTML = `
         <div class="cuenta">
           <div class="cuenta-fila">
-            <span>Perillas que hay que mover</span>
+            <span>Detalles que hay que reenseñarle</span>
             <b>${m.ent === 0 ? "0" : m.entTxt}</b>
           </div>
           <div class="cuenta-fila">
-            <span>Radiografías para ajustarlas</span>
+            <span>Radiografías para enseñárselos</span>
             <b>${m.ej.toLocaleString("es")}</b>
           </div>
           <div class="cuenta-div"></div>
           <div class="cuenta-fila total">
-            <span>Perillas por cada radiografía</span>
+            <span>Detalles por cada radiografía</span>
             <b>${m.ent === 0 ? "—" : m.porEjTxt}</b>
           </div>
         </div>
@@ -595,8 +596,8 @@ const SIM_TRANSFER = {
       root.querySelector('[data-sim-action="lora"]').textContent = st.lora ? "Quitar LoRA" : "Usar LoRA";
       root.querySelector('[data-sim-action="comprobar"]').style.display = fin ? "none" : "";
       root.querySelector(".sim-note").innerHTML = st.lora
-        ? `<b>LoRA activado.</b> En vez de mover los millones de perillas que ya están bien puestas, le añade unas pocas perillas nuevas y mueve solo esas. Por eso las cuentas bajan tanto.`
-        : `🔒 quieto = el modelo conserva lo que ya sabía ahí. 🔧 a mover = tienes que volver a enseñárselo con tus radiografías.`;
+        ? `<b>LoRA activado.</b> En vez de mandarlo a estudiar el oficio otra vez, le das una guía corta al lado que consulta mientras mira la radiografía. Solo hay que enseñarle esa guía: por eso las cuentas bajan tanto.`
+        : `🔒 = eso ya lo sabe, no se lo vuelves a enseñar. 🔧 = esto sí hay que reenseñárselo con tus radiografías.`;
     }
 
     function comprobar() {

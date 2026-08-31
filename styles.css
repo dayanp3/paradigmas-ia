@@ -626,7 +626,7 @@ code{
 .capa-b{ flex:1; min-width:0; }
 .capa-b > b{ display:block; font-family:var(--ff-display); font-size:14px; margin-bottom:2px; }
 .capa-d{ font-size:12.3px; color:var(--text-3); line-height:1.4; }
-.capa-p{ text-align:right; flex-shrink:0; }
+.capa-p{ text-align:right; flex-shrink:0; max-width:40%; }
 .capa-p em{ display:block; font-family:var(--ff-display); font-style:normal; font-weight:700; font-size:14.5px; }
 .capa.entrena .capa-p em{ color:var(--primary-dark); }
 .capa.congelada .capa-p em{ color:var(--text-3); }
