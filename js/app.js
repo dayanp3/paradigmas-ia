@@ -9,6 +9,10 @@ const I = {
   arrow: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`,
   grid:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
   star:  `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5-5.9-3.2-5.9 3.2 1.2-6.5L2.5 9.4l6.6-.9z"/></svg>`,
+  bulb:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6v.5h5.4v-.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 2z"/></svg>`,
+  target:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg>`,
+  plus:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg>`,
+  minus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"/></svg>`,
 };
 
 /* ---------- Estado y persistencia ---------- */
@@ -283,6 +287,120 @@ function viewTema(t) {
   const i = TOPICS.indexOf(t);
   const prev = i > 0 ? TOPICS[i - 1] : null;
   const next = i < TOPICS.length - 1 ? TOPICS[i + 1] : null;
+  const B = [];
+
+  /* Introducción */
+  if (t.intro) B.push(`<div class="block"><div class="card card-intro"><p>${t.intro}</p></div></div>`);
+
+  /* Explicación sencilla, en una frase */
+  if (t.enUnaFrase) B.push(`
+    <div class="block">
+      <div class="frase">
+        <div class="frase-icon">${I.bulb}</div>
+        <div class="frase-body"><div class="fl">En una frase</div><p>${t.enUnaFrase}</p></div>
+      </div>
+    </div>`);
+
+  /* Definición y objetivo */
+  B.push(`
+    <div class="block">
+      <div class="block-label">Definición</div>
+      <div class="card card-def">${t.definicion}</div>
+      ${t.objetivo ? `<div class="objetivo">${I.target}<span><b>Objetivo:</b> ${t.objetivo}</span></div>` : ""}
+    </div>`);
+
+  /* Explicación */
+  B.push(`
+    <div class="block">
+      <div class="block-label">Explicación</div>
+      <div class="prose">${t.explicacion.map(p => `<p>${p}</p>`).join("")}</div>
+    </div>`);
+
+  /* Cómo funciona: pasos + diagrama */
+  B.push(`
+    <div class="block">
+      <div class="block-label">¿Cómo funciona?</div>
+      ${t.pasos ? `<div class="steps">${t.pasos.map((s, n) => `
+        <div class="step">
+          <div class="step-n">${n + 1}</div>
+          <div class="step-b"><b>${s.t}</b><span>${s.d}</span></div>
+        </div>`).join("")}</div>` : ""}
+    </div>
+    <div class="block">
+      <div class="diagram-frame">${t.diagram}</div>
+      <p class="diagram-caption">${t.diagramCaption}</p>
+    </div>`);
+
+  if (t.diagram2) B.push(`
+    <div class="block">
+      <div class="diagram-frame">${t.diagram2}</div>
+      <p class="diagram-caption">${t.diagram2Caption}</p>
+    </div>`);
+
+  /* Ejemplos en pestañas: cotidiano vs. IA */
+  if (t.ejemploCotidiano && t.ejemploIA) B.push(`
+    <div class="block" data-tabs>
+      <div class="block-label">Ejemplos</div>
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" data-tab="0" role="tab">Ejemplo cotidiano</button>
+        <button class="tab-btn" data-tab="1" role="tab">Aplicado a la IA</button>
+      </div>
+      <div class="tab-panel active" data-panel="0">
+        <div class="tab-card"><h4>${t.ejemploCotidiano.t}</h4><p>${t.ejemploCotidiano.d}</p></div>
+      </div>
+      <div class="tab-panel" data-panel="1">
+        <div class="tab-card"><h4>${t.ejemploIA.t}</h4><p>${t.ejemploIA.d}</p></div>
+      </div>
+    </div>`);
+
+  /* Ejemplos técnicos cortos */
+  if (t.examples) B.push(`
+    <div class="block">
+      <div class="grid-2">
+        ${t.examples.map(e => `<div class="example-card"><span class="ex-tag">${e.tag}</span><p>${e.text}</p></div>`).join("")}
+      </div>
+    </div>`);
+
+  if (t.extra) B.push(t.extra);
+
+  /* ¿Dónde se utiliza? */
+  if (t.aplicaciones) B.push(`
+    <div class="block">
+      <div class="block-label">¿Dónde se utiliza?</div>
+      <div class="apps">${t.aplicaciones.map(a => `<div class="app-item"><span class="ai"></span><span>${a}</span></div>`).join("")}</div>
+    </div>`);
+
+  /* Ventajas y limitaciones */
+  if (t.ventajas && t.limitaciones) B.push(`
+    <div class="block">
+      <div class="block-label">Ventajas y limitaciones</div>
+      <div class="proscons">
+        <div class="pc pc-pro">
+          <h4>${I.plus} Ventajas</h4>
+          <ul>${t.ventajas.map(v => `<li>${v}</li>`).join("")}</ul>
+        </div>
+        <div class="pc pc-con">
+          <h4>${I.minus} Limitaciones</h4>
+          <ul>${t.limitaciones.map(v => `<li>${v}</li>`).join("")}</ul>
+        </div>
+      </div>
+    </div>`);
+
+  /* Conceptos clave */
+  if (t.conceptosClave) B.push(`
+    <div class="block">
+      <div class="block-label">Resumen de conceptos clave</div>
+      <div class="concepts">
+        ${t.conceptosClave.map(c => `<div class="concept"><b>${c.t}</b><span>${c.d}</span></div>`).join("")}
+      </div>
+    </div>`);
+
+  /* Ejercicios */
+  B.push(`
+    <div class="block">
+      <div class="block-label">Pon a prueba lo aprendido</div>
+      ${quizHtml(t)}
+    </div>`);
 
   return `
   <section class="view" id="v-tema">
@@ -299,44 +417,7 @@ function viewTema(t) {
             ${topicDone(t) ? `<span class="chip chip-done">${I.check} Completado</span>` : ""}
           </div>
         </div>
-
-        ${t.intro ? `<div class="block"><div class="card card-intro"><p>${t.intro}</p></div></div>` : ""}
-
-        <div class="block">
-          <div class="block-label">Definición</div>
-          <div class="card card-def">${t.definicion}</div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">Explicación</div>
-          <div class="prose">${t.explicacion.map(p => `<p>${p}</p>`).join("")}</div>
-        </div>
-
-        <div class="block">
-          <div class="block-label">Cómo funciona</div>
-          <div class="diagram-frame">${t.diagram}</div>
-          <p class="diagram-caption">${t.diagramCaption}</p>
-        </div>
-
-        ${t.diagram2 ? `<div class="block">
-          <div class="diagram-frame">${t.diagram2}</div>
-          <p class="diagram-caption">${t.diagram2Caption}</p>
-        </div>` : ""}
-
-        <div class="block">
-          <div class="block-label">Ejemplos</div>
-          <div class="grid-2">
-            ${t.examples.map(e => `<div class="example-card"><span class="ex-tag">${e.tag}</span><p>${e.text}</p></div>`).join("")}
-          </div>
-        </div>
-
-        ${t.extra || ""}
-
-        <div class="block">
-          <div class="block-label">Pon a prueba lo aprendido</div>
-          ${quizHtml(t)}
-        </div>
-
+        ${B.join("")}
         <div class="prevnext">
           ${prev ? `<div class="pn" data-topic="${prev.id}"><span class="dir">← Anterior</span><span class="lbl">${prev.title}</span></div>` : `<div class="pn" data-go="temas"><span class="dir">← Volver</span><span class="lbl">Todos los temas</span></div>`}
           ${next ? `<div class="pn next" data-topic="${next.id}"><span class="dir">Siguiente →</span><span class="lbl">${next.title}</span></div>` : `<div class="pn next" data-go="progreso"><span class="dir">Terminaste →</span><span class="lbl">Ver tu progreso</span></div>`}
@@ -463,6 +544,15 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.addEventListener("click", (e) => {
     const opt = e.target.closest(".quiz-opt");
     if (opt) { handleQuizClick(opt); return; }
+
+    const tab = e.target.closest(".tab-btn");
+    if (tab) {
+      const wrap = tab.closest("[data-tabs]");
+      const n = tab.dataset.tab;
+      wrap.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b === tab));
+      wrap.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.dataset.panel === n));
+      return;
+    }
 
     const topicEl = e.target.closest("[data-topic]");
     if (topicEl && !e.target.closest(".quiz")) { go("tema:" + topicEl.dataset.topic); return; }

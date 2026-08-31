@@ -432,6 +432,99 @@ code{
   display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
 }
 
+/* ---------- 13b. Componentes pedagógicos ---------- */
+
+/* "En una frase" */
+.frase{
+  display:flex; gap:15px; align-items:flex-start;
+  background:linear-gradient(135deg, var(--primary-soft), var(--violet-soft));
+  border:1px solid var(--primary-line); border-radius:var(--r-lg); padding:20px 22px;
+}
+.frase-icon{
+  flex-shrink:0; width:34px; height:34px; border-radius:10px; background:var(--surface);
+  display:flex; align-items:center; justify-content:center; color:var(--primary);
+  border:1px solid var(--primary-line);
+}
+.frase-icon svg{ width:18px; height:18px; }
+.frase-body .fl{
+  font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--primary-dark); margin-bottom:4px;
+}
+.frase-body p{ margin:0; font-size:16.5px; color:var(--text); font-weight:500; line-height:1.5; }
+
+/* Objetivo */
+.objetivo{
+  display:flex; gap:11px; align-items:flex-start; font-size:14.5px; color:var(--text-2);
+  background:var(--surface-2); border-radius:var(--r); padding:13px 16px; margin-top:12px;
+}
+.objetivo b{ color:var(--text); }
+.objetivo svg{ width:17px; height:17px; flex-shrink:0; color:var(--primary); margin-top:2px; }
+
+/* Pasos del proceso */
+.steps{ counter-reset:s; display:flex; flex-direction:column; gap:0; }
+.step{ display:flex; gap:15px; position:relative; padding-bottom:20px; }
+.step:last-child{ padding-bottom:0; }
+.step::before{
+  content:""; position:absolute; left:15px; top:34px; bottom:0; width:2px; background:var(--border);
+}
+.step:last-child::before{ display:none; }
+.step-n{
+  flex-shrink:0; width:32px; height:32px; border-radius:50%; z-index:1;
+  background:var(--primary); color:#fff; font-weight:700; font-size:13.5px;
+  display:flex; align-items:center; justify-content:center;
+}
+.step-b{ padding-top:3px; }
+.step-b b{ display:block; font-family:var(--ff-display); font-size:15.5px; margin-bottom:3px; }
+.step-b span{ font-size:14.5px; color:var(--text-2); line-height:1.6; }
+
+/* Pestañas */
+.tabs{ display:flex; gap:6px; margin-bottom:14px; border-bottom:1px solid var(--border); }
+.tab-btn{
+  background:none; border:none; border-bottom:2px solid transparent; cursor:pointer;
+  padding:9px 14px; font-size:14.2px; font-weight:600; color:var(--text-3);
+  transition:.15s; margin-bottom:-1px;
+}
+.tab-btn:hover{ color:var(--text); }
+.tab-btn.active{ color:var(--primary-dark); border-bottom-color:var(--primary); }
+.tab-panel{ display:none; animation:fade .25s ease; }
+.tab-panel.active{ display:block; }
+.tab-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:19px 21px; box-shadow:var(--shadow-sm); }
+.tab-card h4{ font-size:15.5px; margin-bottom:7px; }
+.tab-card p{ margin:0; font-size:15px; color:var(--text-2); }
+
+/* ¿Dónde se utiliza? */
+.apps{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px; }
+.app-item{
+  display:flex; align-items:center; gap:11px; background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--r); padding:13px 15px; font-size:14.3px;
+}
+.app-item .ai{
+  width:8px; height:8px; border-radius:50%; background:var(--primary); flex-shrink:0;
+}
+
+/* Ventajas y limitaciones */
+.proscons{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.pc{ border-radius:var(--r); padding:18px 20px; border:1px solid transparent; }
+.pc-pro{ background:var(--ok-soft); border-color:var(--ok-line); }
+.pc-con{ background:var(--warn-soft); border-color:var(--warn-line); }
+.pc h4{ font-size:14.5px; margin-bottom:11px; display:flex; align-items:center; gap:8px; }
+.pc-pro h4{ color:var(--ok); }
+.pc-con h4{ color:var(--warn); }
+.pc h4 svg{ width:16px; height:16px; }
+.pc ul{ margin:0; padding-left:17px; }
+.pc li{ font-size:14.2px; color:var(--text-2); margin-bottom:7px; line-height:1.55; }
+.pc li:last-child{ margin-bottom:0; }
+
+/* Conceptos clave */
+.concepts{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg);
+  padding:6px 22px; box-shadow:var(--shadow-sm);
+}
+.concept{ display:flex; gap:16px; padding:14px 0; border-bottom:1px solid var(--border); }
+.concept:last-child{ border-bottom:none; }
+.concept b{ flex:0 0 32%; font-family:var(--ff-display); font-size:14.8px; color:var(--text); }
+.concept span{ flex:1; font-size:14.4px; color:var(--text-2); line-height:1.55; }
+
 /* ---------- 14. Responsive ---------- */
 @media (max-width: 1000px){
   .topic-layout{ grid-template-columns:1fr; gap:0; }
@@ -455,6 +548,11 @@ code{
   .hero-stats{ gap:24px; }
   .grid-2{ grid-template-columns:1fr; }
   .topic-grid{ grid-template-columns:1fr; }
+  .proscons{ grid-template-columns:1fr; }
+  .concept{ flex-direction:column; gap:4px; }
+  .concept b{ flex:none; }
+  .tabs{ overflow-x:auto; }
+  .tab-btn{ white-space:nowrap; }
   .prevnext{ flex-direction:column; }
   .pn.next{ text-align:left; }
   .view-head{ padding:30px 0 20px; }
