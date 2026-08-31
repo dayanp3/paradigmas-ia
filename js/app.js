@@ -20,7 +20,8 @@ const STORE_KEY = "paradigmas-ia:v1";
 
 const State = {
   visited: {},        // { topicId: true }
-  answers: {},        // { "topicId:i": true|false }
+  answers: {},        // { "topicId:i": true|false }  ejercicios de práctica
+  retos: {},          // { "topicId:i": true|false }  mini evaluación
   points: 0,
   premiados: {},      // temas cuyo bono de finalización ya se otorgó
   racha: 0,           // días consecutivos con actividad
@@ -35,6 +36,7 @@ function loadState() {
     if (d && typeof d === "object") {
       State.visited = d.visited || {};
       State.answers = d.answers || {};
+      State.retos = d.retos || {};
       State.points = Number(d.points) || 0;
       State.premiados = d.premiados || {};
       State.racha = Number(d.racha) || 0;
@@ -438,11 +440,20 @@ function viewTema(t) {
       </div>
     </div>`);
 
-  /* Ejercicios */
+  /* Ejercicios de práctica */
   B.push(`
     <div class="block">
       <div class="block-label">Pon a prueba lo aprendido</div>
       ${quizHtml(t)}
+    </div>`);
+
+  /* Mini evaluación con ejercicios variados */
+  if (t.reto && t.reto.length) B.push(`
+    <div class="block">
+      <div class="block-label">Mini evaluación</div>
+      <p class="prose" style="margin-bottom:16px">Distintos formatos para comprobar que el concepto quedó claro, no solo que lo recuerdas.</p>
+      ${t.reto.map((r, i) => retoHtml(t, r, i)).join("")}
+      ${resumenHtml(t)}
     </div>`);
 
   return `
@@ -596,6 +607,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadState();
 
   document.body.addEventListener("click", (e) => {
+    if (e.target.closest(".reto")) { if (manejarReto(e)) return; }
+
     const opt = e.target.closest(".quiz-opt");
     if (opt) { handleQuizClick(opt); return; }
 
