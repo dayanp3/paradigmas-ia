@@ -434,6 +434,7 @@ function viewTema(t) {
           <span class="video-play" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
           </span>
+          <span class="video-label">Ver el video aquí mismo</span>
         </button>
         <div class="video-meta">
           <b>${t.video.titulo}</b>
@@ -560,6 +561,15 @@ function reproducirVideo(btn) {
     allowfullscreen></iframe>`;
   btn.replaceWith(cont);
 }
+
+/* La miniatura solo se muestra si de verdad cargó; si no, queda el
+   fondo de la tarjeta, que ya se ve terminado por sí solo. */
+document.addEventListener("load", (e) => {
+  const img = e.target;
+  if (img && img.classList && img.classList.contains("video-thumb") && img.naturalWidth > 120) {
+    img.classList.add("cargada");
+  }
+}, true);
 
 /* maxresdefault no existe en todos los videos: respaldo a hqdefault */
 document.addEventListener("error", (e) => {
