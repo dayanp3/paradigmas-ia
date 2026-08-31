@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paradigmas de Aprendizaje en IA</title>
+<meta name="description" content="Sitio pedagógico sobre los 9 paradigmas de aprendizaje en Inteligencia Artificial: definiciones, explicaciones, ejemplos y ejercicios interactivos.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Top bar (mobile) -->
+  <header class="topbar">
+    <button class="menu-btn" id="menuBtn" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="topbar-title">
+      <span class="logo-mark">◆</span>
+      <span>Paradigmas de Aprendizaje</span>
+    </div>
+    <div class="progress-pill" id="progressPill">0/10</div>
+  </header>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <span class="logo-mark">◆</span>
+      <div>
+        <div class="sidebar-title">Paradigmas de<br>Aprendizaje en IA</div>
+        <div class="sidebar-sub">Guía interactiva</div>
+      </div>
+    </div>
+    <div class="sidebar-scroll">
+      <ul class="nav-list" id="navList"><!-- generado por JS --></ul>
+    </div>
+    <div class="sidebar-foot">
+      <div class="mini-progress"><div class="mini-progress-bar" id="miniProgressBar"></div></div>
+      <div class="sidebar-foot-text"><span id="progressText">0 de 10 secciones vistas</span></div>
+    </div>
+  </nav>
+
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Main -->
+  <main class="content" id="content"><!-- generado por JS --></main>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
